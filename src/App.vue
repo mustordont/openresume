@@ -1,29 +1,43 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
+  <v-app id="inspire">
+    <v-progress-linear class="loader" v-show="busy" :indeterminate="true" height="2"></v-progress-linear>
+    <v-toolbar app>
+      <v-toolbar-title>openResume</v-toolbar-title>
+    </v-toolbar>
+    <v-navigation-drawer app>
+      <router-link to="/">Home</router-link>
       <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+      <router-link to="/login" v-on:click.native="logout()" replace>Logout</router-link>
+    </v-navigation-drawer>
+    <v-content>
+      <v-container fluid>
+        <router-view />
+      </v-container>
+    </v-content>
+    <v-footer></v-footer>
+  </v-app>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+@Component({
+
+})
+export default class App extends Vue {
+  busy = true;
+
+  login(): void {
+    console.log('login');
   }
+}
+</script>
+
+<style lang="scss" scoped>
+.loader {
+  height: 5px;
+  position: absolute;
+  top: 0;
+  z-index: 10;
+  margin: 0;
 }
 </style>
