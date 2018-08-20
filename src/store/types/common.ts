@@ -1,4 +1,8 @@
+export interface RootState {
+  version: string;
+}
+
 export interface Link {
-    url:String,
-    description?:String
+    url: string;
+    description?: string;
 }

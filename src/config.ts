@@ -1,10 +1,10 @@
-let baseUrl = "";
-if (process.env.NODE_ENV === "production") {
-   baseUrl = "http://yourdomain.com/api/";
+let baseUrl = '';
+if (process.env.NODE_ENV === 'production') {
+   baseUrl = 'http://yourdomain.com/api/';
 } else {
-   baseUrl = "https://api-demo.websanova.com/";
+   baseUrl = 'http://localhost:8000/';
 }
 
-export default {
+export const CONFIG: {[key: string]: any} = {
     apiUrl: baseUrl,
 };

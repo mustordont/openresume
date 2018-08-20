@@ -1,31 +1,15 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import { MutationTree, ActionTree } from 'vuex'
-import * as T from './types/common'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import {providersModule} from './providers-module';
+import {RootState} from './types/common';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
-interface State {
-  links: T.Link[]
-}
-
-const mutations: MutationTree<State> = {
-  reverse: (state) => state.links.reverse()
-}
-
-const actions: ActionTree<State, any> = {
-}
-
-const state: State = {
-  links: [
-    { url: "https://vuejs.org", description: "Core Docs" },
-    { url: "https://forum.vuejs.org", description: "Forum" },
-    { url: "https://chat.vuejs.org", description: "Community Chat" }
-  ]
-}
-
-export default new Vuex.Store<State>({
-  state,
-  mutations,
-  actions
+export const store = new Vuex.Store<RootState>({
+  state: {
+    version: '1.0.0', // a simple property
+  },
+  modules: {
+    providers: providersModule,
+  },
 });

@@ -1,12 +1,13 @@
 import Vue from 'vue';
-import VueResource from "vue-resource";
 import Vuetify from 'vuetify';
+Vue.use(Vuetify);
+
+import {ApiServicePlugin} from "./service/api-service";
+Vue.use(ApiServicePlugin);
 
 import App from './App.vue';
-import router from '@/router';
-import store from './store';
-
-Vue.use(Vuetify);
+import {router} from './router';
+import {store} from './store';
 
 Vue.config.productionTip = false;
 

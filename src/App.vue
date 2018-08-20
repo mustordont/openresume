@@ -2,7 +2,7 @@
   <v-app id="inspire">
     <v-progress-linear class="loader" v-show="busy" :indeterminate="true" height="2"></v-progress-linear>
     <v-toolbar app>
-      <v-toolbar-title>openResume</v-toolbar-title>
+      <v-toolbar-title>openResume {{busy}}</v-toolbar-title>
     </v-toolbar>
     <v-navigation-drawer app>
       <router-link to="/">Home</router-link>
@@ -19,15 +19,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-@Component({
+  import {Component, Vue} from 'vue-property-decorator';
 
-})
+@Component({})
 export default class App extends Vue {
-  busy = true;
-
-  login(): void {
-    console.log('login');
+  get busy() {
+    return this.$apiService.busy;
   }
 }
 </script>

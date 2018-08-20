@@ -1,4 +1,7 @@
-//  src/auth/index.js
+import {router} from './router';
+
+export {router} from './router';
+
 /*
 import router from '../router';
 import config from '../config';

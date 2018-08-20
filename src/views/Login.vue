@@ -6,6 +6,7 @@
           Login
         </v-card-title>
         <v-card-text>
+          {{providers.list}}
           <v-text-field v-model="input.login" label="Login"></v-text-field>
           <v-text-field v-model="input.password" label="Password" type="password"></v-text-field>
         </v-card-text>
@@ -19,27 +20,30 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { State, Action, Getter } from 'vuex-class';
+import {ProvidersState} from "../store/providers-module";
 
-@Component({
+const namespace: string = 'providers';
 
-})
+@Component({})
 export default class Login extends Vue {
-  input = {
-    login: "",
-    password: ""
+  @State('providers') providers!: ProvidersState;
+  @Action('getProviders', {namespace}) private _getProviders: any;
+
+  public input = {
+    login: '',
+    password: '',
   };
 
-  login(): void {
+  public mounted() {
+    this._getProviders();
+  }
+
+  public login(): void {
     console.log('login');
   }
 }
 </script>
 
 <style scoped>
-#login {
-  width: 500px;
-  margin: auto;
-  margin-top: 200px;
-  padding: 20px;
-}
 </style>
