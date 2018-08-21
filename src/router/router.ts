@@ -1,12 +1,14 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import LoginComponent from '../views/Login.vue';
-import Home from '../views/Home.vue';
+import AuthProviderComponent from '../views/AuthProvider.vue';
+import ResumeProviderComponent from '../views/ResumeProvider.vue';
 import {authGuard} from './auth';
 
 Vue.use(Router);
 
 export const router: Router = new Router({
+  mode: 'history',
   routes: [
     {
       path: '/login',
@@ -15,12 +17,19 @@ export const router: Router = new Router({
       meta: {auth: false},
     },
     {
+      path: '/auth/:id',
+      name: 'auth',
+      component: AuthProviderComponent,
+      props: true,
+      meta: {auth: false},
+    },
+    {
       path: '/',
       children: [
         {
-          path: 'home',
-          name: 'home',
-          component: Home,
+          path: 'provider/:id',
+          name: 'resume',
+          component: ResumeProviderComponent,
         },
       ],
       beforeEnter: authGuard,

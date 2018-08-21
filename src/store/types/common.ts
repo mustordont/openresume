@@ -1,8 +1,7 @@
 export interface RootState {
   version: string;
-}
-
-export interface Link {
-    url: string;
-    description?: string;
+  busy: boolean;
+  workers: string[];
+  error: string|null;
+  token: string;
 }

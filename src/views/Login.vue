@@ -3,15 +3,10 @@
     <v-flex>
       <v-card>
         <v-card-title>
-          Login
+          {{providersTitle}}
         </v-card-title>
-        <v-card-text>
-          {{providers.list}}
-          <v-text-field v-model="input.login" label="Login"></v-text-field>
-          <v-text-field v-model="input.password" label="Password" type="password"></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn v-on:click="login()">Login</v-btn>
+        <v-card-actions v-if="providersList.length">
+          <v-btn v-on:click="login(provider)" v-for="provider in notLoggedProviders">{{provider.name}}</v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>
@@ -20,27 +15,35 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { State, Action, Getter } from 'vuex-class';
-import {ProvidersState} from "../store/providers-module";
+import { State, Action, Getter, namespace } from 'vuex-class';
+import {ProvidersState} from "../store/providers.module";
+import {ProviderModel} from "../store/models/provider.model";
 
-const namespace: string = 'providers';
+const ProvidersModule = namespace('providers');
 
 @Component({})
 export default class Login extends Vue {
   @State('providers') providers!: ProvidersState;
-  @Action('getProviders', {namespace}) private _getProviders: any;
+  @ProvidersModule.Getter('list') providersList!: ProviderModel[];
+  @Action('getProviders', {namespace: 'providers'}) private _getProviders;
+  @Action('getProviderRedirect', {namespace: 'providers'}) private _getProviderRedirect;
 
-  public input = {
-    login: '',
-    password: '',
-  };
+  get notLoggedProviders(): ProviderModel[] {
+    return this.providersList.filter((i: ProviderModel) => !i.logged);
+  }
 
-  public mounted() {
+  get providersTitle(): string {
+    return this.providersList.length ?
+      (this.notLoggedProviders.length ? 'Please use these providers' : 'You already logged in every provider')
+      : 'Unfortunately providers list is empty';
+  }
+
+  public mounted(): void {
     this._getProviders();
   }
 
-  public login(): void {
-    console.log('login');
+  public login(provider: ProviderModel): void {
+    this._getProviderRedirect(provider.name);
   }
 }
 </script>
