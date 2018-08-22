@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import LoginComponent from '../views/Login.vue';
 import AuthProviderComponent from '../views/AuthProvider.vue';
+import AuthComponent from '../views/Auth.vue';
 import ResumeProviderComponent from '../views/ResumeProvider.vue';
 import {authGuard} from './auth';
 
@@ -24,24 +25,18 @@ export const router: Router = new Router({
       meta: {auth: false},
     },
     {
-      path: '/',
+      path: '',
+      component: AuthComponent,
       children: [
         {
-          path: 'provider/:id',
+          path: '/provider/:id',
           name: 'resume',
           component: ResumeProviderComponent,
+          props: true,
         },
       ],
       beforeEnter: authGuard,
       meta: {auth: true},
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: 'about' */ '../views/About.vue'),
     },
   ],
 });

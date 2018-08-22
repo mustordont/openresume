@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 Vue.use(Vuetify);
 
-import {ApiServicePlugin} from "./service/api-service.plugin";
+import {ApiServicePlugin} from './service/api-service.plugin';
 Vue.use(ApiServicePlugin);
 
 import App from './App.vue';

@@ -1,7 +1,13 @@
 import Vue, {PluginObject} from 'vue';
+import {router} from '../router';
 import {CONFIG} from '../config';
-import {IGetProviderRedirect, IGetProviderAuth} from "./interfaces";
-import {Dictionary} from "vuex";
+
+export interface IRequestParams {
+  url: string;
+  method?: 'GET'|'POST';
+  body?: any;
+  auth?: boolean;
+}
 
 interface IError {
   error: string;
@@ -10,31 +16,22 @@ interface IError {
 }
 
 export class ApiService {
-  constructor() {}
-  public async getProviders(): Promise<string[]> {
-    const response = await fetch(CONFIG.apiUrl + 'auth/providers', {method: 'GET'});
-    return await this._parseResponse(response);
-  }
-
-  public async getProviderRedirect(provider: string): Promise<IGetProviderRedirect> {
-    const response = await fetch(CONFIG.apiUrl + 'auth/' + provider, {method: 'GET'});
-    return await this._parseResponse(response);
-  }
-
-  public async getAuthToken(provider: string, body: Dictionary<string>): Promise<IGetProviderAuth> {
-    const response = await fetch(CONFIG.apiUrl + 'auth/' + provider, {method: 'POST', headers: {
-        'Content-Type': 'application/json'
-      }, body: JSON.stringify(body)});
-    return await this._parseResponse(response);
-  }
-
-  public async refreshToken(token: string): Promise<IGetProviderAuth> {
-    const response = await fetch(CONFIG.apiUrl + 'auth/refresh', {method: 'GET', headers: this._authHeaders});
-    return await this._parseResponse(response);
-  }
-
-  public async getResume(provider: string): Promise<any> {
-    const response = await fetch(CONFIG.apiUrl + '/resume' + provider, {method: 'GET', headers: this._authHeaders});
+  public async makeRequest<R>(params: IRequestParams): Promise<R> {
+    const headers = new Headers({'Content-Type': 'application/json'});
+    if (!params.method) {
+      params.method = 'GET';
+    }
+    if (params.auth) {
+      headers.append('Authorization', `JWT ${localStorage.getItem('token')}`);
+    }
+    const response = await fetch(
+      CONFIG.apiUrl + params.url,
+      {
+        method: params.method,
+        headers,
+        body: params.body ? JSON.stringify(params.body) : null,
+      }
+    );
     return await this._parseResponse(response);
   }
 
@@ -42,19 +39,18 @@ export class ApiService {
     if (response.status >= 200 && response.status < 300) {
       return response.json();
     } else {
+      if (response.status === 401) {
+        router.push({name: 'login'});
+      }
       return response.json()
         .then((result: IError) => Promise.reject(new Error(result.message)));
     }
   }
-
-  private get _authHeaders(): Headers {
-    return new Headers({'Authorization': `JWT ${localStorage.getItem('token')}`});
-  }
 }
 
 export const ApiServicePlugin: PluginObject<any> = {
-  install (vue: typeof Vue, options: any) {
+  install(vue: typeof Vue, options: any) {
     vue.apiService = new ApiService();
     vue.prototype.$apiService = vue.apiService;
-  }
+  },
 };

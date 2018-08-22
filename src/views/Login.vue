@@ -6,7 +6,7 @@
           {{providersTitle}}
         </v-card-title>
         <v-card-actions v-if="providersList.length">
-          <v-btn v-on:click="login(provider)" v-for="provider in notLoggedProviders">{{provider.name}}</v-btn>
+          <v-btn v-on:click="login(provider)" v-for="provider in notLoggedProviders" :key="provider.name">{{provider.name}}</v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>
@@ -15,18 +15,16 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { State, Action, Getter, namespace } from 'vuex-class';
-import {ProvidersState} from "../store/providers.module";
-import {ProviderModel} from "../store/models/provider.model";
+import { Action, namespace } from 'vuex-class';
+import {ProviderModel} from '../store/models/provider.model';
 
 const ProvidersModule = namespace('providers');
 
 @Component({})
 export default class Login extends Vue {
-  @State('providers') providers!: ProvidersState;
-  @ProvidersModule.Getter('list') providersList!: ProviderModel[];
-  @Action('getProviders', {namespace: 'providers'}) private _getProviders;
-  @Action('getProviderRedirect', {namespace: 'providers'}) private _getProviderRedirect;
+  @ProvidersModule.Getter('list') public providersList!: ProviderModel[];
+  @Action('getProviders', {namespace: 'providers'}) private getProviders;
+  @Action('getProviderRedirect', {namespace: 'providers'}) private getProviderRedirect;
 
   get notLoggedProviders(): ProviderModel[] {
     return this.providersList.filter((i: ProviderModel) => !i.logged);
@@ -39,14 +37,11 @@ export default class Login extends Vue {
   }
 
   public mounted(): void {
-    this._getProviders();
+    this.getProviders();
   }
 
   public login(provider: ProviderModel): void {
-    this._getProviderRedirect(provider.name);
+    this.getProviderRedirect(provider.name);
   }
 }
 </script>
-
-<style scoped>
-</style>

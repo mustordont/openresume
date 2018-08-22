@@ -18,14 +18,14 @@
 
   @Component({})
   export default class AuthProvider extends Vue {
-    @Prop() id!: string;
-    code: string = '';
-    @Action('getAuthToken', {namespace: 'providers'}) private _getAuthToken;
+    @Prop() public id!: string;
+    public code: string = '';
+    @Action('getAuthToken', {namespace: 'providers'}) private getAuthToken;
 
     public mounted(): void {
       this.code = this.$route.query.code;
       if (this.id) {
-        this._getAuthToken({provider: this.id, code: this.code});
+        this.getAuthToken({provider: this.id, code: this.code});
       }
     }
   }

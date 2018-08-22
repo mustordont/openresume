@@ -1,4 +1,4 @@
-# openresume
+# pushResume
 
 ## Project setup
 ```

@@ -2,35 +2,34 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import {providersModule} from './providers.module';
 import {RootState} from './types/common';
-import {apiRequest} from "./api-request.decorator";
-import {IGetProviderAuth} from "../service/interfaces";
-import {router} from "../router";
+import {apiRequest} from './api-request.decorator';
+import {IGetProviderAuth, IStats} from '../service/interfaces';
+import {StatsModel} from './models/stats.model';
 
 Vue.use(Vuex);
 
 class StoreApi {
-  @apiRequest()
-  refreshToken({ commit, state, dispatch }, token): any {
-    const parsedToken = this._parseJwt(token);
-    if (parsedToken.exp) {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-        Vue.apiService.refreshToken(token)
-          .then((result: IGetProviderAuth) => {
-            localStorage.setItem('token', result.token);
-            commit('setToken', result.token);
-            dispatch('refreshToken');
-            resolve();
-          })
-          .catch((error) => reject(error));
-        }, new Date(parsedToken.exp*1000).valueOf() - new Date().valueOf() - 60000);
-      });
-    } else {
-      return Promise.reject({message: 'Can\'t refresh. No expiration field at token.'});
-    }
-  };
+  public refreshHandler: number = null;
 
-  private _parseJwt (token) {
+  @apiRequest()
+  public refreshToken({ commit, dispatch }): any {
+    return Vue.apiService.makeRequest({url: 'auth/refresh', auth: true})
+      .then((result: IGetProviderAuth) => {
+        localStorage.setItem('token', result.token);
+        commit('setToken', result.token);
+        dispatch('refreshToken');
+      });
+  }
+
+  @apiRequest()
+  public getStats({ commit }): any {
+    return Vue.apiService.makeRequest({url: 'stats'})
+      .then((response: IStats) => {
+        commit('setStats', new StatsModel(response));
+      });
+  }
+
+  public parseJwt(token) {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
     return JSON.parse(window.atob(base64));
@@ -46,15 +45,17 @@ export const store = new Vuex.Store<RootState>({
     workers: [],
     error: null,
     token: '',
+    stats: new StatsModel(),
   },
   modules: {
     providers: providersModule,
   },
 
   getters: {
-    busy: state => state.busy,
-    error: state => state.error,
-    token: state => state.token,
+    busy: (state) => state.busy,
+    error: (state) => state.error,
+    token: (state) => state.token,
+    stats: (state) => state.stats,
   },
 
   mutations: {
@@ -66,22 +67,40 @@ export const store = new Vuex.Store<RootState>({
     },
     setToken(state, value) {
       state.token = value;
+    },
+    setStats(state, value) {
+      state.stats = value;
     }
   },
 
   actions: {
     addWorker({commit, state}): Promise<number> {
-      const temp = state.workers.length + 1;
-      commit('setBusy', !!temp);
-      return Promise.resolve(temp);
+      const current = new Date().valueOf();
+      state.workers.push(current);
+      commit('setBusy', !!state.workers.length);
+      return Promise.resolve(current);
     },
     removeWorker({commit, state}, {current}): void {
-      state.workers.splice(state.workers.findIndex(i => i === current), 1);
+      state.workers.splice(state.workers.findIndex((i) => i === current), 1);
       commit('setBusy', !!state.workers.length);
     },
     removeError({commit}): void {
       commit('setError', null);
     },
-    refreshToken: (...arg) => storeApi.refreshToken(arg[0], arg[1]),
-  }
+    refreshToken({ commit, state, dispatch }, token) {
+      const parsedToken = storeApi.parseJwt(token);
+      if (parsedToken.exp) {
+        clearTimeout(storeApi.refreshHandler);
+        this.refreshHandler = setTimeout(
+          () => {
+            storeApi.refreshToken({commit, dispatch});
+          },
+          new Date(parsedToken.exp * 1000).valueOf() - new Date().valueOf() - 60000
+          );
+      } else {
+        return console.error('Can\'t refresh. No expiration field at token.');
+      }
+    },
+    getStats: (...args) => storeApi.getStats(args[0]),
+  },
 });

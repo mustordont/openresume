@@ -1,20 +1,46 @@
 <template>
   <v-app id="inspire">
     <v-progress-linear class="loader" v-show="busy" :indeterminate="true" height="2"></v-progress-linear>
-    <v-toolbar app>
-      <v-toolbar-title>openResume</v-toolbar-title>
-    </v-toolbar>
     <v-navigation-drawer app>
-      <router-link to="/login">Login</router-link>
-      <router-link to="/about">About</router-link>
-      <!--<router-link to="/login" v-on:click.native="logout()" replace>Logout</router-link>-->
+      <v-toolbar flat>
+        <v-list>
+          <v-list-tile>
+            <v-list-tile-title class="title">
+              pushResume
+            </v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-toolbar>
+
+      <v-divider></v-divider>
+
+      <v-list dense>
+        <v-list-tile
+          v-for="item in routes"
+          :key="item.title"
+          :to="{name: item.name}"
+        >
+          <v-list-tile-action>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+
+      <v-divider></v-divider>
+      <Stats/>
     </v-navigation-drawer>
+
     <v-content>
       <v-container fluid>
-        <router-view />
+        <v-fade-transition mode="out-in">
+          <router-view />
+        </v-fade-transition>
       </v-container>
     </v-content>
-    <v-footer></v-footer>
 
     <v-snackbar v-model="showError" :timeout="0">
       {{error}}
@@ -24,24 +50,42 @@
 </template>
 
 <script lang="ts">
-  import { State, Action, Getter } from 'vuex-class';
+  import { Action, Getter } from 'vuex-class';
   import {Component, Vue} from 'vue-property-decorator';
-  import {RootState} from "./store/types/common";
+  import Stats from './components/Stats.vue';
 
-@Component({})
-export default class App extends Vue {
-  @Getter('busy') busy!: boolean;
-  @Getter('error') error!: boolean;
-  @Action('removeError') private _removeError: any;
+  @Component({
+    components: {Stats}
+  })
+  export default class App extends Vue {
+    @Getter('busy') public busy!: boolean;
+    @Getter('error') public error!: boolean;
+    @Action('removeError') private removeError: any;
+    @Action('refreshToken') private refreshToken: any;
 
-  get showError(): boolean {
-    return !!this.error;
+    public routes = [
+      {
+        title: 'Providers',
+        icon: 'apps',
+        name: 'login'
+      }
+    ];
+
+    public get showError(): boolean {
+      return !!this.error;
+    }
+
+    public closeError(): void {
+      this.removeError();
+    }
+
+    public mounted(): void {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.refreshToken(token);
+      }
+    }
   }
-
-  closeError(): void {
-    this._removeError();
-  }
-}
 </script>
 
 <style lang="scss" scoped>
