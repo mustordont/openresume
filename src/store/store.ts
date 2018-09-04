@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, {ActionContext} from 'vuex';
 import {providersModule} from './providers.module';
 import {RootState} from './types/common';
 import {apiRequest} from './api-request.decorator';
@@ -12,7 +12,7 @@ class StoreApi {
   public refreshHandler: number = null;
 
   @apiRequest()
-  public refreshToken({ commit, dispatch }): any {
+  public refreshToken({ commit, dispatch }: ActionContext<RootState, RootState>, token?: string): any {
     return Vue.apiService.makeRequest({url: 'auth/refresh', auth: true})
       .then((result: IGetProviderAuth) => {
         localStorage.setItem('token', result.token);
@@ -22,7 +22,7 @@ class StoreApi {
   }
 
   @apiRequest()
-  public getStats({ commit }): any {
+  public getStats({ commit }: ActionContext<RootState, RootState>, payload: any): any {
     return Vue.apiService.makeRequest({url: 'stats'})
       .then((response: IStats) => {
         commit('setStats', new StatsModel(response));
@@ -87,13 +87,13 @@ export const store = new Vuex.Store<RootState>({
     removeError({commit}): void {
       commit('setError', null);
     },
-    refreshToken({ commit, state, dispatch }, token) {
+    refreshToken(args, token) {
       const parsedToken = storeApi.parseJwt(token);
       if (parsedToken.exp) {
         clearTimeout(storeApi.refreshHandler);
         this.refreshHandler = setTimeout(
           () => {
-            storeApi.refreshToken({commit, dispatch});
+            storeApi.refreshToken(args);
           },
           new Date(parsedToken.exp * 1000).valueOf() - new Date().valueOf() - 60000
           );
@@ -101,6 +101,6 @@ export const store = new Vuex.Store<RootState>({
         return console.error('Can\'t refresh. No expiration field at token.');
       }
     },
-    getStats: (...args) => storeApi.getStats(args[0]),
+    getStats: (...args) => storeApi.getStats(...args),
   },
 });

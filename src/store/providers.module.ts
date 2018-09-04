@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import {Module} from 'vuex';
+import {Module, ActionContext} from 'vuex';
 import {RootState} from './types/common';
 import {ProviderModel} from './models/provider.model';
 import {IResume, ResumeModel} from './models/resume.model';
@@ -14,7 +14,7 @@ export interface ProvidersState {
 
 class ProvidersApi {
   @apiRequest()
-  public getProviders({ commit }): any  {
+  public getProviders({ commit }: ActionContext<ProvidersState, RootState>, payload: any): any  {
     return Vue.apiService.makeRequest({url: 'auth/providers'})
       .then((result) => {
         commit('setList', result);
@@ -22,7 +22,7 @@ class ProvidersApi {
   }
 
   @apiRequest()
-  public getProviderRedirect({ commit, dispatch, state }, provider ): any {
+  public getProviderRedirect({ commit, state }: ActionContext<ProvidersState, RootState>, provider ): any {
     return Vue.apiService.makeRequest({url: 'auth/' + provider})
       .then((result: IGetProviderRedirect) => {
         const current = state.list.find((i) => i.name === provider);
@@ -36,7 +36,7 @@ class ProvidersApi {
   }
 
   @apiRequest()
-  public getAuthToken({ commit, state, dispatch }, {provider, code}): any {
+  public getAuthToken({ dispatch }: ActionContext<ProvidersState, RootState>, {provider, code}): any {
     return Vue.apiService.makeRequest({url: 'auth/' + provider, method: 'POST', body: {code}})
       .then((result: IGetProviderAuth) => {
         localStorage.setItem('token', result.token);
@@ -46,7 +46,7 @@ class ProvidersApi {
   }
 
   @apiRequest()
-  public getResumes({ commit }, provider): any {
+  public getResumes({ commit }: ActionContext<ProvidersState, RootState>, provider): any {
     return Vue.apiService.makeRequest({url: 'resume', auth: true})
       .then((result: IResume[]) => {
         const resumes = result.map((i) => new ResumeModel(i));
@@ -55,7 +55,7 @@ class ProvidersApi {
   }
 
   @apiRequest()
-  public toggleResume({ commit, state }, uniq): any {
+  public toggleResume({ commit, state }: ActionContext<ProvidersState, RootState>, uniq): any {
     return Vue.apiService.makeRequest<IToggleResume>({url: 'resume', method: 'POST', auth: true, body: {uniq}})
       .then((result: IToggleResume) => {
         const current: ResumeModel = state.resumes.find((i: ResumeModel) => i.uniq === uniq);
@@ -92,10 +92,10 @@ export const providersModule: Module<ProvidersState, RootState> = {
   },
 
   actions: {
-    getProviders: (args) => providersApi.getProviders(args),
-    getProviderRedirect: (...args) => providersApi.getProviderRedirect(args[0], args[1]),
-    getAuthToken: (...args) => providersApi.getAuthToken(args[0], args[1]),
-    getResumes: (...args) => providersApi.getResumes(args[0], args[1]),
-    toggleResume: (...args) => providersApi.toggleResume(args[0], args[1]),
+    getProviders: (...args) => providersApi.getProviders(...args),
+    getProviderRedirect: (...args) => providersApi.getProviderRedirect(...args),
+    getAuthToken: (...args) => providersApi.getAuthToken(...args),
+    getResumes: (...args) => providersApi.getResumes(...args),
+    toggleResume: (...args) => providersApi.toggleResume(...args),
   },
 };
