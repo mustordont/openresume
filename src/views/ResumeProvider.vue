@@ -3,7 +3,7 @@
     <v-flex>
       <v-card>
         <v-card-title>
-          provider id {{id}}
+          Provider: {{id}}
         </v-card-title>
 
         <v-list two-line>
@@ -11,16 +11,21 @@
             <v-list-tile
               :key="item.link"
             >
-              <v-list-tile-avatar>
-                <v-icon v-on:click="toggleResume(item.uniq)" :color="item.enabled ? 'teal' : ''">{{ item.enabled ? 'check_box' : 'check_box_outline_blank' }}</v-icon>
-              </v-list-tile-avatar>
-
               <v-list-tile-content>
-                <v-list-tile-title v-html="item.label"></v-list-tile-title>
+                <v-list-tile-title>
+                  <a v-bind:href="item.link" target="_blank" rel="noopener">{{item.title}}</a>
+                </v-list-tile-title>
                 <v-list-tile-sub-title>
-                  <a v-bind:href="item.link" target="_blank" rel="noopener">{{item.link}}</a>
+                  Last update: {{item.published}}
                 </v-list-tile-sub-title>
               </v-list-tile-content>
+
+              <v-list-tile-action>
+                <v-switch v-model="item.enabled" v-on:change="toggleResume(item.uniq)"></v-switch>
+              </v-list-tile-action>
+              <v-list-tile-action-text>
+                Auto update {{ item.enabled ? 'enabled' : 'disabled ' }}
+              </v-list-tile-action-text>
             </v-list-tile>
             <v-divider
               v-if="index !== resumes.length - 1"

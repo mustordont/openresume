@@ -17,7 +17,7 @@ class StoreApi {
       .then((result: IGetProviderAuth) => {
         localStorage.setItem('token', result.token);
         commit('setToken', result.token);
-        dispatch('refreshToken');
+        dispatch('refreshToken', result.token);
       });
   }
 

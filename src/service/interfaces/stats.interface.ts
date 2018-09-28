@@ -3,12 +3,17 @@ export interface IHerokuMax {
   total: number;
 }
 
+export interface IProviderStat {
+  [key: string]: number
+}
+
 export interface IStats {
   users: {
-    [key: string]: number;
+    items: IProviderStat[];
+    total: number;
   },
   resume: {
-    [key: string]: number;
+    items: IProviderStat[];
     total: number;
   },
   db: {

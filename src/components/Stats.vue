@@ -6,23 +6,12 @@
         :size="100"
         :width="15"
         :value="stats.memoryUsage"
-        color="primary"
       >
         memory
       </v-progress-circular>
-      <v-progress-circular
-        :rotate="-90"
-        :size="100"
-        :width="15"
-        :value="stats.rowsUsage"
-        color="teal"
-      >
-        rows
-      </v-progress-circular>
-    </v-layout>
-    <v-list dense subheader>
-      <template v-for="(group, index) in stats.groups">
-        <v-subheader class="primary--text">{{group.label}}</v-subheader>
+
+      <v-list dense subheader v-for="(group, index) in stats.groups">
+        <v-subheader class="text">{{group.label}}</v-subheader>
         <v-list-tile
           :key="item.label+index"
           v-for="item in group.items"
@@ -31,12 +20,17 @@
             <v-list-tile-title>{{item.label}}: {{item.count}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-divider
-          v-if="index !== stats.groups.length - 1"
-          :key="index"
-        ></v-divider>
-      </template>
-    </v-list>
+      </v-list>
+
+      <v-progress-circular
+        :rotate="-90"
+        :size="100"
+        :width="15"
+        :value="stats.rowsUsage"
+      >
+        rows
+      </v-progress-circular>
+    </v-layout>
   </v-container>
 </template>
 

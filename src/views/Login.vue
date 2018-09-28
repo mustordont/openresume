@@ -1,5 +1,5 @@
 <template>
-  <v-layout>
+  <v-layout v-if="!busy">
     <v-flex>
       <v-card>
         <v-card-title>
@@ -10,6 +10,14 @@
         </v-card-actions>
       </v-card>
     </v-flex>
+  </v-layout>
+  <v-layout align-center justify-center v-else>
+    <v-progress-circular
+      indeterminate
+      color="primary"
+      :size="100"
+      :width="5"
+    ></v-progress-circular>
   </v-layout>
 </template>
 
@@ -22,6 +30,7 @@ const ProvidersModule = namespace('providers');
 
 @Component({})
 export default class Login extends Vue {
+  busy: boolean = false;
   @ProvidersModule.Getter('list') public providersList!: ProviderModel[];
   @Action('getProviders', {namespace: 'providers'}) private getProviders;
   @Action('getProviderRedirect', {namespace: 'providers'}) private getProviderRedirect;
@@ -41,7 +50,9 @@ export default class Login extends Vue {
   }
 
   public login(provider: ProviderModel): void {
-    this.getProviderRedirect(provider.name);
+    this.busy = true;
+    this.getProviderRedirect(provider.name)
+      .then((result) => this.busy = result);
   }
 }
 </script>

@@ -1,13 +1,9 @@
 <template>
-  <v-layout>
+  <v-layout align-center justify-center>
     <v-flex>
-      <v-card>
-        <v-card-title>
-          provider id {{id}}
-          <br>
-          provider code {{code}}
-        </v-card-title>
-      </v-card>
+      <h5 class="text-xs-center headline">
+        Success<v-icon color="primary" large>done</v-icon>
+      </h5>
     </v-flex>
   </v-layout>
 </template>

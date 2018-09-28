@@ -21,8 +21,15 @@ class ProvidersApi {
       });
   }
 
+  /**
+   * make auth redirect
+   * return true if everything is ok, false otherwise
+   * @param commit
+   * @param state
+   * @param provider
+   */
   @apiRequest()
-  public getProviderRedirect({ commit, state }: ActionContext<ProvidersState, RootState>, provider ): any {
+  public getProviderRedirect({ commit, state }: ActionContext<ProvidersState, RootState>, provider ): Promise<boolean> {
     return Vue.apiService.makeRequest({url: 'auth/' + provider})
       .then((result: IGetProviderRedirect) => {
         const current = state.list.find((i) => i.name === provider);
@@ -32,7 +39,9 @@ class ProvidersApi {
           commit('setList', state.list);
           window.location.href = result.redirect;
         }
-      });
+        return true;
+      })
+      .catch(() => false);
   }
 
   @apiRequest()

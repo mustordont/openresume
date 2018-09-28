@@ -1,46 +1,32 @@
 <template>
   <v-app id="inspire">
     <v-progress-linear class="loader" v-show="busy" :indeterminate="true" height="2"></v-progress-linear>
-    <v-navigation-drawer app>
-      <v-toolbar flat>
-        <v-list>
-          <v-list-tile>
-            <v-list-tile-title class="title">
-              pushResume
-            </v-list-tile-title>
-          </v-list-tile>
-        </v-list>
-      </v-toolbar>
-
-      <v-divider></v-divider>
-
-      <v-list dense>
-        <v-list-tile
-          v-for="item in routes"
-          :key="item.title"
-          :to="{name: item.name}"
-        >
-          <v-list-tile-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-tile-action>
-
-          <v-list-tile-content>
-            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-
-      <v-divider></v-divider>
-      <Stats/>
-    </v-navigation-drawer>
+    <v-toolbar dark class="teal">
+      <v-toolbar-title>pushResume</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-toolbar-items>
+        <v-btn flat
+               dark
+               v-for="item in routes"
+               :key="item.title"
+               :to="{name: item.name}">
+          <v-icon>{{ item.icon }}</v-icon>
+          {{ item.title }}
+        </v-btn>
+      </v-toolbar-items>
+    </v-toolbar>
 
     <v-content>
-      <v-container fluid>
+      <v-container fluid fill-height>
         <v-fade-transition mode="out-in">
           <router-view />
         </v-fade-transition>
       </v-container>
     </v-content>
+
+    <v-footer height="auto" dark class="teal">
+      <Stats/>
+    </v-footer>
 
     <v-snackbar v-model="showError" :timeout="0">
       {{error}}
