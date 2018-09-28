@@ -5,6 +5,7 @@ import {RootState} from './types/common';
 import {apiRequest} from './api-request.decorator';
 import {IGetProviderAuth, IStats} from '../service/interfaces';
 import {StatsModel} from './models/stats.model';
+import {router} from '../router';
 
 Vue.use(Vuex);
 
@@ -100,6 +101,11 @@ export const store = new Vuex.Store<RootState>({
       } else {
         return console.error('Can\'t refresh. No expiration field at token.');
       }
+    },
+    logout({commit}): void {
+      clearTimeout(this.refreshHandler);
+      commit('setToken', null);
+      router.push({name: 'login'});
     },
     getStats: (...args) => storeApi.getStats(...args),
   },

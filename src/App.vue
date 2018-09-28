@@ -1,22 +1,17 @@
 <template>
   <v-app id="inspire">
-    <v-progress-linear class="loader" v-show="busy" :indeterminate="true" height="2"></v-progress-linear>
     <v-toolbar dark class="teal">
-      <v-toolbar-title>pushResume</v-toolbar-title>
+      <v-toolbar-title>
+        <span style="cursor: pointer" v-on:click="toMain()">pushResume</span>
+      </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-toolbar-items>
-        <v-btn flat
-               dark
-               v-for="item in routes"
-               :key="item.title"
-               :to="{name: item.name}">
-          <v-icon>{{ item.icon }}</v-icon>
-          {{ item.title }}
-        </v-btn>
-      </v-toolbar-items>
+      <v-btn v-on:click="logout()" flat fab>
+        <v-icon >power_settings_new</v-icon>
+      </v-btn>
     </v-toolbar>
 
     <v-content>
+      <v-progress-linear class="loader" v-show="busy" :indeterminate="true" height="5" color="primary"></v-progress-linear>
       <v-container fluid fill-height>
         <v-fade-transition mode="out-in">
           <router-view />
@@ -39,6 +34,7 @@
   import { Action, Getter } from 'vuex-class';
   import {Component, Vue} from 'vue-property-decorator';
   import Stats from './components/Stats.vue';
+  import {router} from './router';
 
   @Component({
     components: {Stats}
@@ -48,6 +44,7 @@
     @Getter('error') public error!: boolean;
     @Action('removeError') private removeError: any;
     @Action('refreshToken') private refreshToken: any;
+    @Action('logout') private logout: any;
 
     public routes = [
       {
@@ -71,12 +68,15 @@
         this.refreshToken(token);
       }
     }
+
+    toMain(): void {
+      router.push({name: 'login'});
+    }
   }
 </script>
 
 <style lang="scss" scoped>
 .loader {
-  height: 5px;
   position: absolute;
   top: 0;
   z-index: 10;

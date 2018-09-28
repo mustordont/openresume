@@ -1,15 +1,15 @@
 <template>
-  <v-layout v-if="!busy">
-    <v-flex>
+  <v-layout v-if="!busy" align-center justify-center>
+
       <v-card>
         <v-card-title>
           {{providersTitle}}
         </v-card-title>
-        <v-card-actions v-if="providersList.length">
-          <v-btn v-on:click="login(provider)" v-for="provider in notLoggedProviders" :key="provider.name">{{provider.name}}</v-btn>
+        <v-card-actions v-if="providersList.length" class="text-xs-center">
+          <v-btn v-on:click="login(provider)" v-for="provider in notLoggedProviders" :key="provider.name" large color="primary">{{provider.name}}</v-btn>
         </v-card-actions>
       </v-card>
-    </v-flex>
+
   </v-layout>
   <v-layout align-center justify-center v-else>
     <v-progress-circular
@@ -41,7 +41,7 @@ export default class Login extends Vue {
 
   get providersTitle(): string {
     return this.providersList.length ?
-      (this.notLoggedProviders.length ? 'Please use these providers' : 'You already logged in every provider')
+      (this.notLoggedProviders.length ? 'Please select provider' : 'You already logged in every provider')
       : 'Unfortunately providers list is empty';
   }
 
